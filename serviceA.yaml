@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: service-a
+  name: service-a
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: service-a
+  template:
+    metadata:
+      labels:
+        app: service-a
+        version: v1
+      name: service-a
+    spec:
+      containers:
+      - name: service-a
+        image: pelasne.azurecr.io/http-receiver:1.1.0
+        env:
+        - name: FORMAT
+          value: "text"
+        - name: RESPONSE_CODE
+          value: "200"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-a
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: service-a

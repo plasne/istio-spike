@@ -1,0 +1,8 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  values:
+    gateways:
+      istio-ingressgateway:
+        serviceAnnotations:
+          service.beta.kubernetes.io/azure-load-balancer-internal: "true"

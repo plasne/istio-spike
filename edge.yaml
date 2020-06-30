@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: edge
+  name: edge
+  namespace: istio-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: edge
+  template:
+    metadata:
+      labels:
+        app: edge
+      name: edge
+    spec:
+      containers:
+      - name: edge
+        image: ubuntu
+        command: ["/bin/bash", "-ec", "while :; do echo '.'; sleep 5 ; done"]

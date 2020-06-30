@@ -1,0 +1,61 @@
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: jwt-auth-multiple
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: service-a
+  jwtRules:
+  - issuer: "https://login.microsoftonline.com/a5f2ede2-d815-4bca-a46d-b007a3e1571a/v2.0"
+    jwksUri: "https://login.microsoftonline.com/common/discovery/v2.0/keys"
+  - issuer: "https://accounts.google.com"
+    jwksUri: "https://www.googleapis.com/oauth2/v3/certs"
+  - issuer: "accounts.google.com"
+    jwksUri: "https://www.googleapis.com/oauth2/v3/certs"
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: from-idp-a
+  namespace: istio-system
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      app: service-a
+  rules:
+  - when:
+    - key: request.auth.claims[employee]
+      values: ["*"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: from-idp-b
+  namespace: istio-system
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      app: service-a
+  rules:
+  - when:
+    - key: request.auth.claims[empId]
+      values: ["*"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: if-nonce
+  namespace: istio-system
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      app: service-a
+  rules:
+  - when:
+    - key: request.auth.claims[nonce]
+      values: ["678911"]

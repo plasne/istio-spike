@@ -1,0 +1,61 @@
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: jwt-auth
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: service-b
+  jwtRules:
+  - issuer: "https://login.microsoftonline.com/a5f2ede2-d815-4bca-a46d-b007a3e1571a/v2.0"
+    jwksUri: "https://login.microsoftonline.com/common/discovery/v2.0/keys"
+  - issuer: "https://accounts.google.com"
+    jwksUri: "https://www.googleapis.com/oauth2/v3/certs"
+  - issuer: "accounts.google.com"
+    jwksUri: "https://www.googleapis.com/oauth2/v3/certs"
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-healthz
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: service-b
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        paths: [ "/healthz" ]
+---
+#apiVersion: security.istio.io/v1beta1
+#kind: AuthorizationPolicy
+#metadata:
+#  name: allow-tcp-health-port
+#  namespace: default
+#spec:
+#  selector:
+#    matchLabels:
+#      app: service-b
+#  action: ALLOW
+#  rules:
+#  - to:
+#    - operation:
+#        ports: [ "30829", "32094", "30565", "32318" ]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-if-principal
+  namespace: default
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      app: service-b
+  rules:
+  - from:
+    - source:
+        requestPrincipals: [ "*" ]

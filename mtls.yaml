@@ -1,0 +1,23 @@
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: all-mtls
+  namespace: default
+spec:
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-if-service-or-client
+  namespace: default
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      app: service-c
+  rules:
+  - from:
+    - source:
+        principals: [ "cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account", "cluster.local/ns/default/sa/service-a", "cluster.local/ns/default/sa/client" ]
